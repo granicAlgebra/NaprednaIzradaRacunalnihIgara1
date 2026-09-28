@@ -1,0 +1,101 @@
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
+
+public class Player_Inventory : MonoBehaviour
+{
+    [SerializeField]
+    public static List<GameObject> Inventory = new List<GameObject>();
+    public static GameObject EmptySlot;
+    public static string SlotPointer = "";
+    public static string DragedItemType = "";
+    //Slotovi na igracu
+    public GameObject GloveSlot;
+    public GameObject HeadSlot;
+    public GameObject RingSlot;
+    public GameObject WeaponSlot;
+    public GameObject ArmourSlot;
+    public GameObject ShieldSlot;
+    public GameObject BootsSlot;
+    public GameObject BagSlot;
+
+    public GameObject InventoryGrid;
+    public GameObject InventorySlot;
+
+    private GameObject _player;
+    public UnityEvent OnChangedBag;
+    // Start is called before the first frame update
+    void Start()
+    {       
+        InventorySlotsHandler();
+        _player = GameObject.Find("Player");
+        OnChangedBag.AddListener(InventorySlotsHandler);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Player_Controler.InventoryCapacity += 8;
+            InventorySlotsHandler();
+            Debug.Log(Player_Controler.InventoryCapacity);
+        }
+    }
+    // Postavlja kolicinu slotova u listu Inventory i InventoryGrid s obzirom na maksimalni kapacitet
+    private void InventorySlotsHandler()
+    {
+        int currentSlotsNum = Inventory.Count;
+        if(currentSlotsNum < Player_Controler.InventoryCapacity)
+        {           
+            for (int i = 0; i < Player_Controler.InventoryCapacity - currentSlotsNum; i++)
+            {
+                GameObject slot = GameObject.Instantiate(InventorySlot, InventoryGrid.transform);
+                Inventory.Add(slot);
+            }
+            InventoryGrid.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Player_Controler.InventoryCapacity / 8 * 41);
+        }
+        else if(currentSlotsNum > Player_Controler.InventoryCapacity)
+        {            
+            for (int i = Player_Controler.InventoryCapacity; i < currentSlotsNum; i++)
+            {
+                bool hasEmptySlot = false;
+                int newCapacityCounter = Player_Controler.InventoryCapacity;
+                if (Inventory[i].transform.childCount > 0)
+                {   
+                    //Uslucaju da ima praznih mjesta u inventoriju, premjesta iteme na prazna mjesta, a ako nema, dropa iteme van
+                    foreach (GameObject slot in Inventory)
+                    {                      
+                        if(newCapacityCounter == 0)
+                        {
+                            break;
+                        }
+                        if (slot.transform.childCount == 0)
+                        {
+                            hasEmptySlot = true;
+                            Inventory[i].transform.GetChild(0).transform.SetParent(slot.transform);
+                            slot.transform.GetChild(0).localPosition = Vector2.zero;
+                            break;
+                        }
+                        newCapacityCounter--;
+                    }
+                    if (!hasEmptySlot)
+                    {
+                        DropItemHandler(Inventory[i]);
+                    }
+                }
+                GameObject.Destroy(Inventory[i]);
+            }
+           
+            Inventory.RemoveRange(Player_Controler.InventoryCapacity, currentSlotsNum - Player_Controler.InventoryCapacity);
+            InventoryGrid.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Player_Controler.InventoryCapacity / 8 * 41);
+        }
+    }
+    // Ispusta item iz inventorija na pod
+    private void DropItemHandler(GameObject item)
+    {
+        GameObject.Instantiate(item.GetComponentInChildren<Drag_and_drop>().DropItem, new Vector3(_player.transform.position.x, _player.transform.position.y - 1f, -2f), Quaternion.identity);
+        RectTransform.Destroy(item.gameObject);
+        Debug.Log("No free slots in inventory! Items are droped!");
+    }
+}
