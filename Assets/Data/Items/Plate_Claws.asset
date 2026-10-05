@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f58bfa0fcdcde94282db61dc53b9db0, type: 3}
+  m_Name: Plate_Claws
+  m_EditorClassIdentifier: Assembly-CSharp::GearData
+  ItemName: Plate Claws
+  Slot: gloves
+  Icon: {fileID: 4008627345246242305, guid: 728c09e39b8fd9f41b52ce982948ab46, type: 3}
+  Rarity: magic
+  Description: 
+  Armour: 2
+  MaxHealth: 0
+  Damage: 2
+  Speed: 0

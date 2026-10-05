@@ -1,6 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 public class Player_Controler : MonoBehaviour
 {
@@ -9,126 +12,519 @@ public class Player_Controler : MonoBehaviour
     public static int RupleCurrency { get; set; } = 0;
     public static int InventoryCapacity { get; set; } = 32;
     public static int Damage { get; set; } = 1;
+    //steta trenutno equipanog oruzja (postavlja EquipWeapon)
+    public static int WeaponDamage { get; set; } = 0;
     public static int Armour { get; set; } = 1;
     //Brzina kretanja playera u svim smjerovima. 1 = 16 px u sekundi.
-    public static int Speed { get; set; } = 3; 
+    public static int Speed { get; set; } = 3;
+
+    //osnovne vrijednosti bez opreme (RecalculateStats = osnova + oprema)
+    public const int BASE_MAX_HEALTH = 100;
+    public const int BASE_ARMOUR = 1;
+    public const int BASE_DAMAGE = 1;
+    public const int BASE_SPEED = 3;
+
+    //Zbroji bonuse sa sve equipane opreme i osvjezi UI
+    public static void RecalculateStats()
+    {
+        int armour = 0, maxHp = 0, damage = 0, speed = 0;
+        GameObject gm = GameObject.Find("GameManager");
+        if (gm == null) return;
+        Player_Inventory inv = gm.GetComponent<Player_Inventory>();
+        GameObject[] slots = { inv.HeadSlot, inv.ArmourSlot, inv.GloveSlot, inv.BootsSlot, inv.RingSlot, inv.AmuletSlot };
+        foreach (GameObject slot in slots)
+        {
+            if (slot == null || slot.transform.childCount == 0) continue;
+            Inventory_LootItem item = slot.transform.GetChild(0).GetComponent<Inventory_LootItem>();
+            if (item == null || item.Gear == null) continue;
+            armour += item.Gear.Armour;
+            maxHp += item.Gear.MaxHealth;
+            damage += item.Gear.Damage;
+            speed += item.Gear.Speed;
+        }
+        Armour = BASE_ARMOUR + armour;
+        MaxHealth = BASE_MAX_HEALTH + maxHp;
+        Damage = BASE_DAMAGE + damage;
+        Speed = BASE_SPEED + speed;
+        if (CurrentHealth > MaxHealth) CurrentHealth = MaxHealth;
+
+        UI_Controler ui = gm.GetComponent<UI_Controler>();
+        ui.OnChangedMaxHP.Invoke();
+        ui.OnChangedHealth.Invoke();
+        ui.OnChangedArmour.Invoke();
+        ui.OnChangedDamage.Invoke();
+        ui.OnChangedSpeed.Invoke();
+    }
+    //Stamina se trosi na napade i puni se kad player ne napada
+    public static int MaxStamina { get; set; } = 100;
+    public static float CurrentStamina { get; set; } = 100;
+    public float StaminaRegen = 20; //po sekundi
+    public float LightAttackStamina = 15;
+    public float HeavyAttackStamina = 40;
     //Korigira brzinu kod dijagonalnog kretanja => cos 45' = 0.7071 ili korijen iz 2 / 2 =  0.7071.
     public const float DIAGONAL_MOVEMENT_CORRECTION = 0.7071f;
 
-    private Rigidbody2D _playerRigidsBody;
+    private NavMeshAgent _playerNavMeshAgent;
     private Animator _playerAnimator;
+
+    private float movementSpeed;
+    private bool isMovingWithKeys = false;
+    private Vector3 direction;
+
+    public bool isAttacking = false;
+    private float attackTimer = 0;
+    private Quaternion attackRotation;
+    public float attackTurnSpeed = 540; //stupnjeva u sekundi
+
+    [Header("Weapon")]
+    public WeaponData CurrentWeapon;
+    //clipovi iz Player.controllera koje oruzje zamjenjuje
+    public AnimationClip LightAttackPlaceholder;
+    public AnimationClip HeavyAttackPlaceholder;
+    private AnimatorOverrideController _overrideController;
+    public Transform WeaponSocket; // child od mixamorig:RightHand
+    public GameObject DefaultHeavyVFX;
+    public float HeavyVFXLead = 0.4f; //koliko sekundi prije udarca se pali slash efekt
+    private GameObject _weaponModel;
 
     void Start()
     {
-        _playerRigidsBody = this.GetComponent<Rigidbody2D>();
+        _playerNavMeshAgent = this.GetComponent<NavMeshAgent>();
         _playerAnimator = this.GetComponent<Animator>();
-        _playerAnimator.speed = Speed;
+        //_playerAnimator.speed = Speed;
+        _playerAnimator.speed = 1;
+        _playerAnimator.applyRootMotion = false;
+
+        //static vrijednosti prezive ucitavanje scene, pa ako je player umro vrati mu zivot
+        if (CurrentHealth <= 0)
+        {
+            CurrentHealth = MaxHealth;
+            CurrentStamina = MaxStamina;
+        }
+
+        // inspector vrijednosti su prespore za ovo
+        _playerNavMeshAgent.angularSpeed = 720;
+        _playerNavMeshAgent.acceleration = 30;
+        _playerNavMeshAgent.stoppingDistance = 0.1f;
+
+        //jedna instanca override controllera, oruzja u njoj samo mijenjaju clipove
+        _overrideController = new AnimatorOverrideController(_playerAnimator.runtimeAnimatorController);
+        _playerAnimator.runtimeAnimatorController = _overrideController;
+        EquipWeapon(CurrentWeapon);
+
+        //pocetno oruzje stavi i u weapon slot da se moze skinut/zamijenit
+        GameObject gm = GameObject.Find("GameManager");
+        if (CurrentWeapon != null && gm != null)
+        {
+            Player_Inventory inv = gm.GetComponent<Player_Inventory>();
+            if (inv != null && inv.WeaponSlot.transform.childCount == 0)
+            {
+                Inventory_LootItem.Create(new LootItem { Name = CurrentWeapon.WeaponName, ItemType = "weapon", Weapon = CurrentWeapon }, inv.WeaponSlot.transform);
+            }
+        }
+    }
+
+    //Zamjeni animacije napada i brzinu napada prema oruzju (null = bez oruzja)
+    public void EquipWeapon(WeaponData weapon)
+    {
+        CurrentWeapon = weapon;
+        AnimationClip light = null;
+        AnimationClip heavy = null;
+        float speed = 1;
+        if (weapon != null)
+        {
+            light = weapon.LightAttack;
+            heavy = weapon.HeavyAttack;
+            speed = weapon.AttackSpeed;
+        }
+        //null u overrideu = vraca originalni clip iz controllera
+        _overrideController[LightAttackPlaceholder] = light;
+        _overrideController[HeavyAttackPlaceholder] = heavy;
+        _playerAnimator.SetFloat("AttackSpeed", speed);
+
+        //update atributa (damage)
+        WeaponDamage = weapon != null ? weapon.Damage : 0;
+        GameObject gameManager = GameObject.Find("GameManager");
+        if (gameManager != null && gameManager.GetComponent<UI_Controler>() != null)
+        {
+            gameManager.GetComponent<UI_Controler>().OnChangedDamage.Invoke();
+        }
+
+        //model oruzja u ruci
+        if (_weaponModel != null)
+        {
+            Destroy(_weaponModel);
+        }
+        if (weapon != null && weapon.Model != null && WeaponSocket != null)
+        {
+            _weaponModel = Instantiate(weapon.Model, WeaponSocket);
+            _weaponModel.transform.localPosition = weapon.HoldOffset;
+            _weaponModel.transform.localRotation = Quaternion.Euler(weapon.HoldRotation);
+            foreach (Collider c in _weaponModel.GetComponentsInChildren<Collider>())
+            {
+                Destroy(c);
+            }
+        }
+        Debug.Log("Equipped " + (weapon != null ? weapon.WeaponName : "nothing"));
+    }
+
+    private AnimationClip currentLightClip()
+    {
+        if (CurrentWeapon != null && CurrentWeapon.LightAttack != null) return CurrentWeapon.LightAttack;
+        return LightAttackPlaceholder;
+    }
+
+    private AnimationClip currentHeavyClip()
+    {
+        if (CurrentWeapon != null && CurrentWeapon.HeavyAttack != null) return CurrentWeapon.HeavyAttack;
+        return HeavyAttackPlaceholder;
+    }
+
+    private float attackSpeed()
+    {
+        if (CurrentWeapon != null && CurrentWeapon.AttackSpeed > 0) return CurrentWeapon.AttackSpeed;
+        return 1;
+    }
+
+    private int weaponDamage()
+    {
+        if (CurrentWeapon != null) return Damage + CurrentWeapon.Damage;
+        return Damage;
     }
 
 
+    public bool isDead = false;
+
     void Update()
     {
-        _playerMovementControl();
+        //Smrt
+        if (CurrentHealth <= 0 && isDead == false)
+        {
+            Die();
+        }
+        if (isDead == true)
+        {
+            return;
+        }
+
+        _playerAttack();
+        if (isAttacking == false)
+        {
+            CurrentStamina = CurrentStamina + StaminaRegen * Time.deltaTime;
+            if (CurrentStamina > MaxStamina)
+            {
+                CurrentStamina = MaxStamina;
+            }
+            _playerMovementControl();
+            _playerMouseMovement();
+        }
         _playerAnimationHandler();
+    }
+
+    //Je li mis iznad nekog UI elementa (gumb, prozor, slot...)
+    private bool IsPointerOverUI()
+    {
+        return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+    }
+
+    private void Die()
+    {
+        isDead = true;
+        isAttacking = false;
+        CancelInvoke(); //da ne udari nakon smrti
+        _playerNavMeshAgent.ResetPath();
+        _playerNavMeshAgent.velocity = Vector3.zero;
+        _playerNavMeshAgent.isStopped = true;
+        _playerAnimator.SetFloat("RunBlend", 0);
+        _playerAnimator.SetBool("Death", true);
+        SFX.PlayAt(SFX.Instance.PlayerDeath, transform.position);
+        //mrtav player vise ne kupi ruple i srca
+        SphereCollider pickup = GetComponent<SphereCollider>();
+        if (pickup != null)
+        {
+            pickup.enabled = false;
+        }
+        Debug.Log("Player died");
+    }
+
+    //Napadi: desni klik = normalni napad, Q = AOE napad
+    private void _playerAttack()
+    {
+        if (isAttacking == true)
+        {
+            //polako se okreni prema smjeru napada
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, attackRotation, attackTurnSpeed * Time.deltaTime);
+            attackTimer = attackTimer - Time.deltaTime;
+            if (attackTimer <= 0)
+            {
+                isAttacking = false;
+            }
+            return;
+        }
+
+        //klik po UI (inventory, loot...) ne smije napasti
+        if (Mouse.current.rightButton.wasPressedThisFrame && IsPointerOverUI())
+        {
+            //nista
+        }
+        else if (Mouse.current.rightButton.wasPressedThisFrame && CurrentStamina < LightAttackStamina)
+        {
+            Debug.Log("Not enough stamina!");
+        }
+        else if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            CurrentStamina = CurrentStamina - LightAttackStamina;
+            isAttacking = true;
+            //trajanje i trenutak udarca dolaze iz clipa i oruzja
+            attackTimer = currentLightClip().length / attackSpeed();
+            isMovingWithKeys = false;
+            _playerNavMeshAgent.ResetPath();
+            _playerNavMeshAgent.velocity = Vector3.zero;
+            //okreni se prema misu (rotacija se radi postepeno gore u isAttacking)
+            attackRotation = transform.rotation;
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 1000, ~0, QueryTriggerInteraction.Ignore))
+            {
+                Vector3 lookAt = hit.point - transform.position;
+                lookAt.y = 0;
+                if (lookAt != Vector3.zero)
+                {
+                    attackRotation = Quaternion.LookRotation(lookAt);
+                }
+            }
+            _playerAnimator.SetInteger("AttackType", 2);
+            _playerAnimator.SetTrigger("Attack");
+            float lightHit = CurrentWeapon != null ? CurrentWeapon.LightHitTime : 0.4f;
+            Invoke("SingleTargetHit", attackTimer * lightHit); //kad mac udari
+            Invoke("LightSwingSound", Mathf.Max(0, attackTimer * lightHit - 0.15f));
+        }
+
+        if (Keyboard.current.qKey.wasPressedThisFrame && CurrentStamina < HeavyAttackStamina)
+        {
+            Debug.Log("Not enough stamina!");
+        }
+        else if (Keyboard.current.qKey.wasPressedThisFrame)
+        {
+            CurrentStamina = CurrentStamina - HeavyAttackStamina;
+            isAttacking = true;
+            attackTimer = currentHeavyClip().length / attackSpeed();
+            isMovingWithKeys = false;
+            _playerNavMeshAgent.ResetPath();
+            _playerNavMeshAgent.velocity = Vector3.zero;
+            attackRotation = transform.rotation; //AOE se ne okrece
+            _playerAnimator.SetInteger("AttackType", 1);
+            _playerAnimator.SetTrigger("Attack");
+            float heavyHit = CurrentWeapon != null ? CurrentWeapon.HeavyHitTime : 0.45f;
+            Invoke("AoeHit", attackTimer * heavyHit);
+            Invoke("SpawnHeavyVFX", Mathf.Max(0, attackTimer * heavyHit - HeavyVFXLead));
+            Invoke("HeavySwingSound", Mathf.Max(0, attackTimer * heavyHit - HeavyVFXLead));
+        }
+    }
+
+    private void LightSwingSound()
+    {
+        SFX.PlayAt(SFX.Instance.LightSwing, transform.position);
+    }
+
+    private void HeavySwingSound()
+    {
+        SFX.PlayAt(SFX.Instance.HeavySwing, transform.position);
+    }
+
+    private void SingleTargetHit()
+    {
+        float range = CurrentWeapon != null ? CurrentWeapon.LightRange : 1.5f;
+        float radius = CurrentWeapon != null ? CurrentWeapon.LightRadius : 1.2f;
+        int dmg = weaponDamage();
+        Collider[] hits = Physics.OverlapSphere(transform.position + transform.forward * range, radius);
+        GameObject closest = null;
+        float closestDistance = 999;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].gameObject.tag == "Enemy")
+            {
+                float d = Vector3.Distance(transform.position, hits[i].transform.position);
+                if (d < closestDistance)
+                {
+                    closestDistance = d;
+                    closest = hits[i].gameObject;
+                }
+            }
+        }
+        if (closest != null)
+        {
+            closest.SendMessage("TakeDamage", dmg, SendMessageOptions.DontRequireReceiver);
+            Debug.Log("Hit " + closest.name + " for " + dmg);
+        }
+    }
+
+    //slash efekt jakog napada (pali se malo prije udarca da se poklopi s animacijom)
+    private void SpawnHeavyVFX()
+    {
+        if (isDead) return;
+        GameObject vfx = DefaultHeavyVFX;
+        if (CurrentWeapon != null && CurrentWeapon.HeavyAttackVFX != null)
+        {
+            vfx = CurrentWeapon.HeavyAttackVFX;
+        }
+        if (vfx != null)
+        {
+            GameObject fx = Instantiate(vfx, transform.position + Vector3.up * 1f, transform.rotation);
+            Destroy(fx, 2);
+        }
+    }
+
+    private void AoeHit()
+    {
+        float radius = CurrentWeapon != null ? CurrentWeapon.HeavyRadius : 3.5f;
+        int dmg = CurrentWeapon != null ? weaponDamage() * CurrentWeapon.HeavyDamageMultiplier : Damage;
+        Collider[] hits = Physics.OverlapSphere(transform.position, radius);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].gameObject.tag == "Enemy")
+            {
+                hits[i].gameObject.SendMessage("TakeDamage", dmg, SendMessageOptions.DontRequireReceiver);
+                Debug.Log("AOE hit " + hits[i].gameObject.name + " for " + dmg);
+            }
+        }
     }
 
     private void _playerMovementControl()
     {
-        float movementSpeed = Speed;
-        //Speed up;
-        if (Input.GetKey(KeyCode.LeftShift))
+        movementSpeed = Speed * 1.5f;
+        //Shift = hodanje (prije je bilo trcanje)
+        if (Keyboard.current.leftShiftKey.isPressed)
         {
-            movementSpeed = Speed * 2;
-            //Brzina animacije prati brzinu kretanja
-            _playerAnimator.speed = movementSpeed;
+            movementSpeed = Speed * 0.5f;
         }
+        _playerNavMeshAgent.speed = movementSpeed;
+
+        direction = new Vector3(0, 0, 0);
         //Down
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
         {
-            _playerRigidsBody.linearVelocity = new Vector2(0, -1 * movementSpeed);
+            direction = direction + new Vector3(0, 0, -1);
         }
         //Up
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
         {
-            _playerRigidsBody.linearVelocity = new Vector2(0, 1 * movementSpeed);
+            direction = direction + new Vector3(0, 0, 1);
         }
         //Left
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
         {
-            _playerRigidsBody.linearVelocity = new Vector2(-1 * movementSpeed, 0);
+            direction = direction + new Vector3(-1, 0, 0);
         }
         //Right
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
         {
-            _playerRigidsBody.linearVelocity = new Vector2(1 * movementSpeed, 0);
+            direction = direction + new Vector3(1, 0, 0);
         }
         //Diagonalno kretanje
-        if (Input.GetKey(KeyCode.DownArrow) && Input.GetKey(KeyCode.LeftArrow))
+        if (direction.x != 0 && direction.z != 0)
         {
-            _playerRigidsBody.linearVelocity = new Vector2(-1 * movementSpeed * DIAGONAL_MOVEMENT_CORRECTION, -1 * movementSpeed * DIAGONAL_MOVEMENT_CORRECTION);
+            direction = direction * DIAGONAL_MOVEMENT_CORRECTION;
         }
-        if (Input.GetKey(KeyCode.DownArrow) && Input.GetKey(KeyCode.RightArrow))
+
+        if (direction != Vector3.zero)
         {
-            _playerRigidsBody.linearVelocity = new Vector2(1 * movementSpeed * DIAGONAL_MOVEMENT_CORRECTION, -1 * movementSpeed * DIAGONAL_MOVEMENT_CORRECTION);
+            isMovingWithKeys = true;
+            //tipke prekidaju klik kretanje
+            _playerNavMeshAgent.ResetPath();
+            //Move ne da playeru izac sa navmesha
+            _playerNavMeshAgent.Move(direction * movementSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), 15 * Time.deltaTime);
         }
-        if (Input.GetKey(KeyCode.UpArrow) && Input.GetKey(KeyCode.LeftArrow))
+        else
         {
-            _playerRigidsBody.linearVelocity = new Vector2(-1 * movementSpeed * DIAGONAL_MOVEMENT_CORRECTION, 1 * movementSpeed * DIAGONAL_MOVEMENT_CORRECTION);
-        }
-        if (Input.GetKey(KeyCode.UpArrow) && Input.GetKey(KeyCode.RightArrow))
-        {
-            _playerRigidsBody.linearVelocity = new Vector2(1 * movementSpeed * DIAGONAL_MOVEMENT_CORRECTION, 1 * movementSpeed * DIAGONAL_MOVEMENT_CORRECTION);
-        }
-        //Kraj kretanja
-        if (Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow))
-        {
-            _playerRigidsBody.linearVelocity = new Vector2(0, 0);
-        }
-        //Kraj trcanja
-        if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            movementSpeed = Speed;
-            _playerAnimator.speed = movementSpeed;
+            isMovingWithKeys = false;
         }
     }
+
+    public float LootClickRange = 2.5f;
+    public float StepDistance = 1.4f;
+    private float stepCounter = 0;
+    private bool holdingLootClick = false;
+
+    //Kretanje misem kao u diablu
+    private void _playerMouseMovement()
+    {
+        if (isMovingWithKeys == true)
+        {
+            return;
+        }
+        //drzanje lijeve tipke = player ide za misem
+        //klik po UI ne smije pomaknuti playera
+        //klik na vrecu/skrinju - ako je blizu otvori loot prozor, inace hodaj do nje
+        if (Mouse.current.leftButton.wasPressedThisFrame && IsPointerOverUI() == false)
+        {
+            Ray lootRay = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            RaycastHit[] hits = Physics.RaycastAll(lootRay, 1000, ~0, QueryTriggerInteraction.Collide);
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+            foreach (RaycastHit h in hits)
+            {
+                Loot_Bag bag = h.collider.GetComponentInParent<Loot_Bag>();
+                if (bag == null) continue;
+                if (bag.Items.Count > 0 && Vector3.Distance(transform.position, bag.transform.position) <= LootClickRange)
+                {
+                    FindFirstObjectByType<Loot_Window>().Open(bag);
+                    _playerNavMeshAgent.ResetPath();
+                    holdingLootClick = true;
+                }
+                break;
+            }
+        }
+        if (Mouse.current.leftButton.isPressed == false)
+        {
+            holdingLootClick = false;
+        }
+        if (holdingLootClick == true)
+        {
+            return;
+        }
+        if (Mouse.current.leftButton.isPressed && IsPointerOverUI() == false)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 1000, ~0, QueryTriggerInteraction.Ignore))
+            {
+                _playerNavMeshAgent.SetDestination(hit.point);
+            }
+        }
+    }
+
     //Promjena animacije prilikom kretanja
     private void _playerAnimationHandler()
     {
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        float currentSpeed = 0;
+        if (isAttacking == true)
         {
-            _playerAnimator.SetBool("IsWalkingDown", true);
+            currentSpeed = 0;
         }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        else if (isMovingWithKeys == true)
         {
-            _playerAnimator.SetBool("IsWalkingUp", true);
+            currentSpeed = direction.magnitude * movementSpeed;
         }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else
         {
-            _playerAnimator.SetBool("IsWalkingLeft", true);
+            currentSpeed = _playerNavMeshAgent.velocity.magnitude;
         }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        //1 = run, 0.2 = walk, 0 = idle
+        _playerAnimator.SetFloat("RunBlend", currentSpeed / (Speed * 1.5f), 0.1f, Time.deltaTime);
+
+        //koraci - svakih StepDistance metara jedan korak
+        if (currentSpeed > 0.3f)
         {
-            _playerAnimator.SetBool("IsWalkingRight", true);
+            stepCounter = stepCounter + currentSpeed * Time.deltaTime;
+            if (stepCounter >= StepDistance)
+            {
+                stepCounter = 0;
+                SFX.PlayAt(SFX.Instance.Footsteps, transform.position, 0.6f, 0.15f);
+            }
         }
-        if (Input.GetKeyUp(KeyCode.DownArrow))
-        {
-            _playerAnimator.SetBool("IsWalkingDown", false);
-            _playerAnimator.Play("Player_idle", 0, 0);
-        }
-        if (Input.GetKeyUp(KeyCode.UpArrow))
-        {
-            _playerAnimator.SetBool("IsWalkingUp", false);
-            _playerAnimator.Play("Player_idle", 0, 0.3f);
-        }
-        if (Input.GetKeyUp(KeyCode.LeftArrow))
-        {
-            _playerAnimator.SetBool("IsWalkingLeft", false);
-            _playerAnimator.Play("Player_idle", 0, 0.6f);
-        }
-        if (Input.GetKeyUp(KeyCode.RightArrow))
-        {
-            _playerAnimator.SetBool("IsWalkingRight", false);
-            _playerAnimator.Play("Player_idle", 0, 0.9f);
-        }
+
+        //UI_Controler stavlja animator speed na Speed pa ga vracamo
+        _playerAnimator.speed = 1;
     }
 }

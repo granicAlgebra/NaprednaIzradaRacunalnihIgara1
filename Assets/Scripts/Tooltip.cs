@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.EventSystems;
 public class Tooltip : MonoBehaviour , IPointerEnterHandler, IPointerExitHandler
@@ -18,7 +19,7 @@ public class Tooltip : MonoBehaviour , IPointerEnterHandler, IPointerExitHandler
     private UI_Controler _uiControler;
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!Input.GetKey(KeyCode.X))
+        if (!Keyboard.current.xKey.isPressed)
         {
             _uiControler.ToolTipActive();
             _toolTipPannel.GetComponent<RectTransform>().position = this.GetComponent<RectTransform>().position;
@@ -53,7 +54,7 @@ public class Tooltip : MonoBehaviour , IPointerEnterHandler, IPointerExitHandler
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.X)||Input.GetMouseButtonDown(2))
+        if (Keyboard.current.xKey.wasPressedThisFrame||Mouse.current.rightButton.wasPressedThisFrame)
         {
             _toolTipPannel.SetActive(false);
             foreach (GameObject attribute in AttributesCreated)

@@ -15,7 +15,7 @@ public class Potion : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Middle)
+        if (eventData.button == PointerEventData.InputButton.Right)
         {
             Player_Controler.CurrentHealth += HealthAmout * gameObject.GetComponent<Stack>().StackAmout;
             Debug.Log("Consumed " + transform.name);

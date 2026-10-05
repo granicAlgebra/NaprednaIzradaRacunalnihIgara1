@@ -2,8 +2,23 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - ArmourSlot
+  - WeaponSlot
+  - Tooltip
+  - GloveSlot
+  - BagSlot
+  - HeadSlot
+  - ShieldSlot
+  - BootsSlot
+  - RingSlot
+  - InventorySlot
+  - Enemy
+  - Ruple
+  - Heart
+  - Loot
+  - AmuletSlot
   layers:
   - Default
   - TransparentFX
@@ -50,27 +65,3 @@ TagManager:
   - Light Layer 5
   - Light Layer 6
   - Light Layer 7
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 

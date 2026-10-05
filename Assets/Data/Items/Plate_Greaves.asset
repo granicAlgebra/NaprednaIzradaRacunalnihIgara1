@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f58bfa0fcdcde94282db61dc53b9db0, type: 3}
+  m_Name: Plate_Greaves
+  m_EditorClassIdentifier: Assembly-CSharp::GearData
+  ItemName: Plate Greaves
+  Slot: boots
+  Icon: {fileID: -5546064669409388962, guid: 6eb618d8a79c0a44894aa479c1467d94, type: 3}
+  Rarity: magic
+  Description: 
+  Armour: 3
+  MaxHealth: 0
+  Damage: 0
+  Speed: 1

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Events;
 using TMPro;
 
@@ -12,6 +13,8 @@ public class Collect_Items : MonoBehaviour
     public GameObject MessageContainer;
 
     public UI_Controler UiControler;
+    public Loot_Window LootWindow;
+    private GameObject _lootForPickup;
     private bool _timerStart = false;
     private int _timerTicks = 0;
     private void FixedUpdate()
@@ -26,8 +29,14 @@ public class Collect_Items : MonoBehaviour
     private void Update()
     {
         _pickupItem(_itemForPickup);
+
+        //Otvori loot prozor na F kad je player kraj vrece
+        if (_lootForPickup != null && Keyboard.current.fKey.wasPressedThisFrame)
+        {
+            LootWindow.Open(_lootForPickup.GetComponent<Loot_Bag>());
+        }
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter(Collider collision)
     {
         //Pokupi Heart i doda vrjednost
         if(collision.tag == "Heart")
@@ -42,6 +51,7 @@ public class Collect_Items : MonoBehaviour
                 Debug.Log("Collected: " + collision.name);
             }
             UiControler.OnChangedHealth.Invoke();
+            SFX.Play(SFX.Instance.DrinkPotion, 0.6f);
             Destroy(collision.gameObject);
         }
         //Pokupi Ruple i doda vrjednost
@@ -49,22 +59,31 @@ public class Collect_Items : MonoBehaviour
         {
             Player_Controler.RupleCurrency += collision.GetComponent<Ruple_Value>().RupleValue;
             UiControler.OnChangedRuples.Invoke();
+            SFX.Play(SFX.Instance.Coins);
             Destroy(collision.gameObject);
             Debug.Log("Collected: " + collision.name);
         }
-        //Dohvaca item koji se moze kasnije pokupit na tipku  Y
-        if (collision.tag == "Item")
+        //Itemi se vise ne kupe sa poda nego samo preko loot sistema
+        //if (collision.tag == "Item")
+        //{
+        //    _itemForPickup = collision.gameObject;
+        //}
+        if (collision.tag == "Loot")
         {
-            _itemForPickup = collision.gameObject;
+            _lootForPickup = collision.gameObject;
         }
     }
    
-    private void OnTriggerExit2D(Collider2D collision)
+    private void OnTriggerExit(Collider collision)
     {
         //Ako je igrac dalje od itema, nemoze ga vise pokupit
         if (collision.tag == "Item")
         {
             _itemForPickup = null;
+        }
+        if (collision.tag == "Loot")
+        {
+            _lootForPickup = null;
         }
     }
     //Pokupi item
@@ -72,7 +91,7 @@ public class Collect_Items : MonoBehaviour
     {
         if(item != null)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Keyboard.current.eKey.wasPressedThisFrame)
             {   
                 //Provjerava dali postoji item u weapon slotu po njegovoj vrsti i dodaje ako je slot prazan, ako nije doda u prazan slot u inventoriju
                 if(PlayerInventory.WeaponSlot.transform.childCount == 0 && item.GetComponent<ItemForInventory>().itemType == "weapon")

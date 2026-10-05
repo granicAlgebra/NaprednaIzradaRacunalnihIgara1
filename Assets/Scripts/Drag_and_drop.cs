@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -26,14 +27,14 @@ public class Drag_and_drop : MonoBehaviour, IPointerClickHandler
     {
         if (_isItemInAir)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Mouse.current.leftButton.wasPressedThisFrame)
             {
                 _dropItem();
                 _isItemInAir = false;
                 return;
             }
             //Ako se inventory zatvori dok je u zraku vraca se nazad u slot
-            if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.E))
+            if (Keyboard.current.iKey.wasPressedThisFrame || Keyboard.current.eKey.wasPressedThisFrame)
             {
                 transform.SetParent(_lastParent.transform);
                 transform.localPosition = Vector2.zero;
@@ -44,7 +45,7 @@ public class Drag_and_drop : MonoBehaviour, IPointerClickHandler
                 gameObject.GetComponent<CanvasGroup>().blocksRaycasts = true;
                 return;
             }
-            transform.position = Input.mousePosition;
+            transform.position = (Vector3)Mouse.current.position.ReadValue();
         }
     }
     public void OnPointerClick(PointerEventData eventData)
@@ -55,7 +56,7 @@ public class Drag_and_drop : MonoBehaviour, IPointerClickHandler
             _inAirItem();
         }
         //Dropa item vani u kombinaciji tipke X sa klikom misa
-        if (Input.GetKey(KeyCode.X))
+        if (Keyboard.current.xKey.isPressed)
         {
             if (gameObject.GetComponent<Stack>() != null)
             {

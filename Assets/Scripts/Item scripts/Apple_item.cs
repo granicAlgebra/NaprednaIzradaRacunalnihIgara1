@@ -15,7 +15,7 @@ public class Apple_item : MonoBehaviour, IPointerClickHandler
     
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Middle)
+        if (eventData.button == PointerEventData.InputButton.Right)
         {
             Player_Controler.CurrentHealth += HealthAmout;
             Debug.Log("Consumed " + transform.name);

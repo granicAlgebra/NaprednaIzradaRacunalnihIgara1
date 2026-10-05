@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 public class Item_Spawner : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class Item_Spawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Keyboard.current.mKey.wasPressedThisFrame)
         {
             if (_objectNum < SpawnObject.Count)
             {
@@ -29,7 +30,7 @@ public class Item_Spawner : MonoBehaviour
                 ItemName.text = "Spawn: " + SpawnObject[_objectNum].name;
             }
         }
-        if (Input.GetKeyDown(KeyCode.N))
+        if (Keyboard.current.nKey.wasPressedThisFrame)
         {
             if (_objectNum > 0)
             {
@@ -37,7 +38,7 @@ public class Item_Spawner : MonoBehaviour
                 ItemName.text = "Spawn: " + SpawnObject[_objectNum].name;
             }
         }
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Keyboard.current.bKey.wasPressedThisFrame)
         {
             GameObject item = GameObject.Instantiate(SpawnObject[_objectNum]);
             item.transform.position = new Vector3(Player.transform.position.x, Player.transform.position.y - 2f, -2f);

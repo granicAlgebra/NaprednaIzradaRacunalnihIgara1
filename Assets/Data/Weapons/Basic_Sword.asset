@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 235fb5b76d8105049ac7b00a7b90cba7, type: 3}
+  m_Name: Basic_Sword
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  WeaponName: Longsword
+  WeaponType: sword
+  Damage: 2
+  Model: {fileID: 6400777163403016504, guid: 170c20833ec66fa44ac93a09574ab585, type: 3}
+  Icon: {fileID: -4239846758799542297, guid: 6d643f7e08b75264c884d00256ee245e, type: 3}
+  HoldOffset: {x: 0, y: 0, z: 0}
+  HoldRotation: {x: 0, y: 0, z: 0}
+  HeavyAttackVFX: {fileID: 7396515142774620206, guid: e3a593ee4ab33f242b61a9d68c8a61c5, type: 3}
+  LightAttack: {fileID: -203655887218126122, guid: 72745f36c9af4cf4fb6b1fe666b0863d, type: 3}
+  HeavyAttack: {fileID: -203655887218126122, guid: e19bfde86194c144498d8ec557a7993f, type: 3}
+  AttackSpeed: 1.2
+  LightHitTime: 0.4
+  LightRange: 1.5
+  LightRadius: 1.2
+  HeavyHitTime: 0.44
+  HeavyRadius: 3.5
+  HeavyDamageMultiplier: 2

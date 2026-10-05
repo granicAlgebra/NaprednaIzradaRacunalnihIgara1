@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 
 public class Shield : MonoBehaviour, IEquipable, IPointerClickHandler
@@ -75,7 +76,7 @@ public class Shield : MonoBehaviour, IEquipable, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         //Ako dropa iz equipment slota
-        if (Input.GetKey(KeyCode.X))
+        if (Keyboard.current.xKey.isPressed)
         {
             Player_Controler.Armour -= ArmourAmout;
             _uiControler.OnChangedArmour.Invoke();

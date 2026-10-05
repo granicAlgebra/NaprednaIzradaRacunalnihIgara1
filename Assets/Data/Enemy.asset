@@ -1,0 +1,286 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7823734651004499136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 274f5a9170b474c4a85ae3c6970ce707, type: 3}
+  m_Name: RandomPositionNearby
+  m_EditorClassIdentifier: Assembly-CSharp::RandomPositionNearby
+  state: 0
+  started: 0
+  guid: d57b490c4feb0a44a86f9b5988d6b2f4
+  position: {x: 0, y: 360}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  Radius: 6
+--- !u!114 &-4778116460558094094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afb5496e8cd973748a10b3e3ef436ebd, type: 3}
+  m_Name: Repeat
+  m_EditorClassIdentifier: Assembly-CSharp::TheKiwiCoder.Repeat
+  state: 0
+  started: 0
+  guid: bb63897825dee214d82d955a4f5029f1
+  position: {x: 0, y: 0}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  child: {fileID: -1057670471389573970}
+  restartOnSuccess: 1
+  restartOnFailure: 0
+--- !u!114 &-4591649681052705404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61431bba79d7d7843b82bf1de71703f5, type: 3}
+  m_Name: Sequencer
+  m_EditorClassIdentifier: Assembly-CSharp::TheKiwiCoder.Sequencer
+  state: 0
+  started: 0
+  guid: 6c065ef36c165ee4ea4f944e6325451c
+  position: {x: 0, y: 240}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  children:
+  - {fileID: -3345256602144149668}
+  - {fileID: 6974709406152877491}
+  - {fileID: 1069455515009916845}
+--- !u!114 &-3345256602144149668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd775b8f976ba8f429ca8ed01dfdac97, type: 3}
+  m_Name: SearchingForEnemy
+  m_EditorClassIdentifier: Assembly-CSharp::SearchingForEnemy
+  state: 0
+  started: 0
+  guid: 81999bca933a38f4db77496fbcc63fc3
+  position: {x: -220, y: 360}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  EnemyLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  EnemyTag: Player
+  ViewRadius: 12
+  ViewAngle: 150
+  CheckInterval: 0.25
+--- !u!114 &-2436904792649915734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 163c147d123e4a945b688eddc64e3ea5, type: 3}
+  m_Name: RootNode
+  m_EditorClassIdentifier: Assembly-CSharp::TheKiwiCoder.RootNode
+  state: 0
+  started: 0
+  guid: 91805bc9fca998e4d84aeb487b6166ce
+  position: {x: 0, y: -120}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  child: {fileID: -4778116460558094094}
+--- !u!114 &-1057670471389573970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7bf77e26564daa41815cba042a730aa, type: 3}
+  m_Name: InterruptSelector
+  m_EditorClassIdentifier: Assembly-CSharp::TheKiwiCoder.InterruptSelector
+  state: 0
+  started: 0
+  guid: 6e3e1b614c82c4944923cade43a3fb83
+  position: {x: 0, y: 120}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  children:
+  - {fileID: -4591649681052705404}
+  - {fileID: 2621936195425661089}
+--- !u!114 &-170849830708709073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a5134d9de14153468b48928d3e7359a, type: 3}
+  m_Name: Wait
+  m_EditorClassIdentifier: Assembly-CSharp::TheKiwiCoder.Wait
+  state: 0
+  started: 0
+  guid: 160efc138eb2b104b8227751668b9e47
+  position: {x: 440, y: 360}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  duration: 2.5
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d285eb63c2cdd74180de7cfceaa96ad, type: 3}
+  m_Name: Enemy
+  m_EditorClassIdentifier: Assembly-CSharp::TheKiwiCoder.BehaviourTree
+  rootNode: {fileID: -2436904792649915734}
+  treeState: 0
+  nodes:
+  - {fileID: -2436904792649915734}
+  - {fileID: -4778116460558094094}
+  - {fileID: -1057670471389573970}
+  - {fileID: -4591649681052705404}
+  - {fileID: -3345256602144149668}
+  - {fileID: 6974709406152877491}
+  - {fileID: 1069455515009916845}
+  - {fileID: 2621936195425661089}
+  - {fileID: -7823734651004499136}
+  - {fileID: 5359469837838776187}
+  - {fileID: -170849830708709073}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &1069455515009916845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e9fa1ded2976284e973cf4e93b425d3, type: 3}
+  m_Name: AttackTarget
+  m_EditorClassIdentifier: Assembly-CSharp::AttackTarget
+  state: 0
+  started: 0
+  guid: b6a9962253f76654d948a0dbb8cbe7c2
+  position: {x: 220, y: 360}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  AttackRate: 3.6
+  AttackRange: 2
+  Damage: 10
+  HitDelay: 1.3
+--- !u!114 &2621936195425661089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61431bba79d7d7843b82bf1de71703f5, type: 3}
+  m_Name: Sequencer
+  m_EditorClassIdentifier: Assembly-CSharp::TheKiwiCoder.Sequencer
+  state: 0
+  started: 0
+  guid: 0a7320131e2b192469476b29d9c996c5
+  position: {x: 220, y: 240}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  children:
+  - {fileID: -7823734651004499136}
+  - {fileID: 5359469837838776187}
+  - {fileID: -170849830708709073}
+--- !u!114 &5359469837838776187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4489e3e257543504c8fc9f891246af6c, type: 3}
+  m_Name: MoveToPosition
+  m_EditorClassIdentifier: Assembly-CSharp::MoveToPosition
+  state: 0
+  started: 0
+  guid: 6688bd993b3c73d4985aa2dd7ab8218e
+  position: {x: 220, y: 360}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  speed: 1.2
+  stoppingDistance: 0.2
+  updateRotation: 1
+  acceleration: 8
+  tolerance: 0.6
+--- !u!114 &6974709406152877491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 600a6938da977b448b86cc4ca153e3d8, type: 3}
+  m_Name: MoveToTarget
+  m_EditorClassIdentifier: Assembly-CSharp::MoveToTarget
+  state: 0
+  started: 0
+  guid: 6a64b3ec080b1ef4d8fcd552e29ddda3
+  position: {x: 0, y: 360}
+  blackboard:
+    moveToPosition: {x: 0, y: 0, z: 0}
+  description: 
+  drawGizmos: 0
+  Speed: 3
+  StopDistance: 1.5
+  Acceleration: 12

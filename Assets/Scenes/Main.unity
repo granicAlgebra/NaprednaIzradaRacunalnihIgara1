@@ -539,9 +539,9 @@ RectTransform:
   - {fileID: 987517388}
   m_Father: {fileID: 539982338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 310, y: -188.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 360, y: 119}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &102559520
@@ -901,9 +901,9 @@ RectTransform:
   - {fileID: 148504700}
   m_Father: {fileID: 539982338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 310, y: -470.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 360, y: 119}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &144088397
@@ -3167,6 +3167,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 600095137}
+  - component: {fileID: 600095138}
   m_Layer: 5
   m_Name: SettingsMenu
   m_TagString: Untagged
@@ -3197,6 +3198,35 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &600095138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600095136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df8a90028df7d994c82381c7095b8375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Settings
+  MasterVolume: {fileID: 436832002}
+  musicVolume: {fileID: 930181896}
+  Sfx_Volume: {fileID: 1389192714}
+  masterText: {fileID: 833135886}
+  MusicText: {fileID: 532442830}
+  sfxtext: {fileID: 489459542}
+  Fullscreen: {fileID: 1581704952}
+  vsync: {fileID: 223439002}
+  QualityLeft: {fileID: 110773407}
+  QualityRight: {fileID: 223560984}
+  QualityText: {fileID: 160292486}
+  Back: {fileID: 1449467177}
+  Close: {fileID: 142372965}
+  MainMenuCanvas: {fileID: 681252579}
+  quality: 0
+  music: 0
+  sfx: 0
 --- !u!1 &653833749
 GameObject:
   m_ObjectHideFlags: 0
@@ -3281,6 +3311,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 681252580}
+  - component: {fileID: 681252581}
   m_Layer: 5
   m_Name: MainMenu
   m_TagString: Untagged
@@ -3310,6 +3341,23 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &681252581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 681252579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55675ff6e1f311d409b9454654ff19bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenu
+  Play: {fileID: 102559520}
+  Continue: {fileID: 1658670133}
+  Settings: {fileID: 144088397}
+  Quit: {fileID: 1266848377}
+  SettingsCanvas: {fileID: 600095136}
 --- !u!1 &708623342
 GameObject:
   m_ObjectHideFlags: 0
@@ -4528,9 +4576,9 @@ RectTransform:
   - {fileID: 85333194}
   m_Father: {fileID: 539982338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 310, y: -611.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 360, y: 119}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1266848377
@@ -5522,9 +5570,9 @@ RectTransform:
   - {fileID: 1024684237}
   m_Father: {fileID: 539982338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 310, y: -329.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 360, y: 119}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1658670133

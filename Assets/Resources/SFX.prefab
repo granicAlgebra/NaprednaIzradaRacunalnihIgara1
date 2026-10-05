@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8271619076367696785
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7497731947927194164}
+  - component: {fileID: 5056549373094075074}
+  m_Layer: 0
+  m_Name: SFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7497731947927194164
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8271619076367696785}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5056549373094075074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8271619076367696785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab6355df029f7f5488d283f81e5fe7f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SFX
+  Click:
+  - {fileID: 8300000, guid: def0eb5944d3765449f2e393903e92e8, type: 3}
+  - {fileID: 8300000, guid: 0920fb9a9e3b55e4eb7301fe0e65bd23, type: 3}
+  OpenWindow:
+  - {fileID: 8300000, guid: 245f1d4ea39c7314ba54e98d1c0abd25, type: 3}
+  Coins:
+  - {fileID: 8300000, guid: c9205f2d0006a1b45b0139ba8bd8ba79, type: 3}
+  - {fileID: 8300000, guid: 7f95973a3ad193d4b9c8d548ea393c51, type: 3}
+  - {fileID: 8300000, guid: d094afe8a30cd9f43bbc20321cbb38e6, type: 3}
+  DrinkPotion:
+  - {fileID: 8300000, guid: 3426662b4bc4fb0418bef9742abd8f14, type: 3}
+  - {fileID: 8300000, guid: cc2175a1c1d387e43b445e53f13fb1bd, type: 3}
+  - {fileID: 8300000, guid: eb76cffa03731a84a81dc99ba7a75393, type: 3}
+  Footsteps:
+  - {fileID: 8300000, guid: 504af1eb15b1860428825e353ed91694, type: 3}
+  - {fileID: 8300000, guid: a08691e866b43c2478cb5657c7c29067, type: 3}
+  LightSwing:
+  - {fileID: 8300000, guid: 1517abdd241f6eb40b8596fe501e31ee, type: 3}
+  - {fileID: 8300000, guid: af03f9ece3ca53f42b01531482c88b39, type: 3}
+  - {fileID: 8300000, guid: 33dd10b6cd1143241a3eefee42f8de49, type: 3}
+  - {fileID: 8300000, guid: e357135436f8d214d89db2b82ea418b7, type: 3}
+  HeavySwing:
+  - {fileID: 8300000, guid: d2500ee980c454943a28859e5899e9e8, type: 3}
+  - {fileID: 8300000, guid: f895e680a452528468d29323d3e49f5b, type: 3}
+  - {fileID: 8300000, guid: 5fe5d2e51b8d691409cc573c56d6f4ac, type: 3}
+  - {fileID: 8300000, guid: b16cc30e4a5040149901f62dedc9c893, type: 3}
+  - {fileID: 8300000, guid: e3d08c02816e0ab4f9f944406df65cd9, type: 3}
+  - {fileID: 8300000, guid: e1d2cc74058e9854482d8961cb23d2bc, type: 3}
+  PlayerHurt:
+  - {fileID: 8300000, guid: bdc6d6d3af62af047be8b09742771011, type: 3}
+  PlayerDeath:
+  - {fileID: 8300000, guid: 607905ba9ba3c8b4e9d62c9740c05782, type: 3}
+  EnemyHit:
+  - {fileID: 8300000, guid: bf84c70232f7d1e4c95e56b868f40efa, type: 3}
+  - {fileID: 8300000, guid: e2b7565167409d844a749569342c4433, type: 3}
+  - {fileID: 8300000, guid: b469a482671f95d4a9d5d6514cfee258, type: 3}
+  ZombieAttack:
+  - {fileID: 8300000, guid: 59d494e79dd7f1a4eaab311eda628b6c, type: 3}
+  - {fileID: 8300000, guid: ef0ebe587bbee5e48b486235835ed2a1, type: 3}
+  - {fileID: 8300000, guid: 3a4b1d2a78273cf4a93f64598fe6f959, type: 3}
+  ZombieGrowl:
+  - {fileID: 8300000, guid: e5cb7fff85aa3d745a04580ee58e9ec5, type: 3}
+  - {fileID: 8300000, guid: dbf0cace52fea964b83c8a2b04f99e98, type: 3}
+  - {fileID: 8300000, guid: 9e7ae1158d105384a9b04387e8795d2d, type: 3}
+  - {fileID: 8300000, guid: 9538ed435f62ffb47b3ecd9cfac61b90, type: 3}
+  ZombieAggro:
+  - {fileID: 8300000, guid: 009b2ec0559757f4ba5a40f0a279c5ae, type: 3}
+  ZombieDeath:
+  - {fileID: 8300000, guid: a41078d9842d4a7419e0c08839b0d819, type: 3}
+  Volume: 1
+  MinDistance: 12
+  MaxDistance: 45

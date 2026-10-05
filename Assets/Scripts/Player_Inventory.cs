@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Events;
 
 public class Player_Inventory : MonoBehaviour
@@ -18,6 +19,7 @@ public class Player_Inventory : MonoBehaviour
     public GameObject ShieldSlot;
     public GameObject BootsSlot;
     public GameObject BagSlot;
+    public GameObject AmuletSlot;
 
     public GameObject InventoryGrid;
     public GameObject InventorySlot;
@@ -35,7 +37,7 @@ public class Player_Inventory : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Keyboard.current.pKey.wasPressedThisFrame)
         {
             Player_Controler.InventoryCapacity += 8;
             InventorySlotsHandler();

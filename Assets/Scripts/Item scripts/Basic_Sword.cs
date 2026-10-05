@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 
 public class Basic_Sword : MonoBehaviour, IWeapon, IEquipable, IPointerClickHandler
@@ -82,7 +83,7 @@ public class Basic_Sword : MonoBehaviour, IWeapon, IEquipable, IPointerClickHand
     public void OnPointerClick(PointerEventData eventData)
     {
         //Ako dropa iz equipment slota
-        if (Input.GetKey(KeyCode.X))
+        if (Keyboard.current.xKey.isPressed)
         {
             Player_Controler.Damage -= DamageAmout;
             Player_Controler.Speed -= SpeedAmout;

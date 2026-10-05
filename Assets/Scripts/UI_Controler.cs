@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Events;
 using TMPro;
 
@@ -67,7 +68,8 @@ public class UI_Controler : MonoBehaviour
     }
     private void _changeDamage()
     {
-        InventoryDamage.text = Player_Controler.Damage.ToString();
+        //osnovna steta + steta oruzja
+        InventoryDamage.text = (Player_Controler.Damage + Player_Controler.WeaponDamage).ToString();
     }
     private void _changeArmour()
     {
@@ -81,20 +83,21 @@ public class UI_Controler : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.I)){
+        if (Keyboard.current.iKey.wasPressedThisFrame){
             InventoryActivitySwap();
         }
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Keyboard.current.eKey.wasPressedThisFrame)
         {
             EquipmentActivitySwap();
         }
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Keyboard.current.cKey.wasPressedThisFrame)
         {
             AtributtesActivitySwap();
         }
     }
     public void InventoryActivitySwap()
     {
+        SFX.Play(SFX.Instance.OpenWindow); //zvuk otvaranja/zatvaranja
         if (InventoryPannel.active)
         {
             InventoryPannel.SetActive(false);
@@ -108,6 +111,7 @@ public class UI_Controler : MonoBehaviour
     }
     public void EquipmentActivitySwap()
     {
+        SFX.Play(SFX.Instance.OpenWindow); //zvuk otvaranja/zatvaranja
         if (EquipmentPannel.active)
         {
             EquipmentPannel.SetActive(false);
@@ -121,6 +125,7 @@ public class UI_Controler : MonoBehaviour
     }
     public void AtributtesActivitySwap()
     {
+        SFX.Play(SFX.Instance.OpenWindow); //zvuk otvaranja/zatvaranja
         if (AtributtesPannel.active)
         {
             AtributtesPannel.SetActive(false);

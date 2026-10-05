@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 235fb5b76d8105049ac7b00a7b90cba7, type: 3}
+  m_Name: Jagged_Blade
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  WeaponName: Jagged Blade
+  WeaponType: sword
+  Damage: 4
+  Model: {fileID: 1148023034579920388, guid: 48ea54f22e3f704458682a956cd4b519, type: 3}
+  Icon: {fileID: 4135829422965561627, guid: 56a9ba22e2997f04b8e94de222a71ff2, type: 3}
+  HoldOffset: {x: 0, y: 0, z: 0}
+  HoldRotation: {x: 0, y: 0, z: 0}
+  HeavyAttackVFX: {fileID: 7396515142774620206, guid: e3a593ee4ab33f242b61a9d68c8a61c5, type: 3}
+  LightAttack: {fileID: -203655887218126122, guid: 72745f36c9af4cf4fb6b1fe666b0863d, type: 3}
+  HeavyAttack: {fileID: -203655887218126122, guid: e19bfde86194c144498d8ec557a7993f, type: 3}
+  AttackSpeed: 1
+  LightHitTime: 0.4
+  LightRange: 1.7
+  LightRadius: 1.2
+  HeavyHitTime: 0.44
+  HeavyRadius: 4
+  HeavyDamageMultiplier: 2

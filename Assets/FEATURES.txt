@@ -1,0 +1,117 @@
+POPIS FEATUREA - Napredna izrada racunalnih igara (top-down ARPG)
+Unity 6.3, URP, Input System (novi), TextMeshPro, NavMesh, Behaviour Tree (TheKiwiCoder)
+==============================================================================
+
+SCENE
+-----
+- Main        - glavni izbornik (Play, Settings, Quit)
+- Level1      - igrivi level (polje psenice, mlin, suma, rijeka...), top-down kao Diablo
+
+GLAVNI IZBORNIK / PAUZA / SETTINGS
+----------------------------------
+- Main menu: Play (ucita Level1), Settings, Quit (MainMenu.cs)
+- Esc = pauza: Resume, Settings, Main Menu; zamrzne vrijeme i zvuk (PauseController.cs)
+- Settings: Master / Music / SFX glasnoca (sliderom, %), Fullscreen, VSync,
+  Quality lijevo/desno, sprema u PlayerPrefs (Settings.cs)
+  * Master glasnoca radi (AudioListener.volume), SFX glasnoca se primjenjuje na sve efekte
+  * Music slider jos nema funkciju (nema glazbe)
+
+KAMERA
+------
+- Kamera prati playera odozgo pod kutom (Camera_Move.cs)
+
+PLAYER - KRETANJE
+-----------------
+- NavMeshAgent kretanje
+- WASD kretanje
+- Drzanje lijeve tipke misa = player ide za misem (Diablo stil)
+- Klik po UI-u ne pomice playera
+- Animacije idle / walk / run preko blend vrijednosti (RunBlend)
+- Zvuk koraka
+
+PLAYER - BORBA
+--------------
+- Desni klik = lagani napad (jedna meta ispred playera), okret prema misu
+- Q = jaki AOE napad (Whirlwind) oko playera, sa slash VFX efektom
+  * VFX se pali ranije od udarca (HeavyVFXLead, 0.4 s)
+- Stamina: napadi trose staminu, regenerira se kad se ne napada
+- Trajanje napada i trenutak udarca dolaze iz animacijskog clipa i oruzja
+- Brzina napada ovisi o oruzju (AttackSpeed parametar u animatoru)
+- Zvukovi zamaha (lagani / jaki) i pogotka
+- Health, smrt playera (death animacija, zvuk, gasi se kontrola i skupljanje)
+
+PLAYER - STATSI
+---------------
+- Max HP, Health, Damage, Weapon Damage, Armour, Speed, Stamina, Ruple (novac)
+- Statsi se racunaju iz bazne vrijednosti + opreme (RecalculateStats)
+- Armour smanjuje primljenu stetu (steta - armour/2, minimalno 1)
+- HUD: health i stamina (HUD_Status.cs)
+- Attributes prozor prikazuje sve statse i osvjezava se kod promjene
+
+ORUZJE (ScriptableObject WeaponData, Assets/Data/Weapons)
+---------------------------------------------------------
+- Basic Sword, Bone Axe, Heavy Axe, Jagged Blade, Orc Cleaver
+- Svako oruzje ima: damage, model, ikonu, poziciju u ruci, lagani i jaki napad
+  (animacijski clipovi), brzinu napada, domet, radijus, multiplikator za AOE, VFX
+- Equip oruzja mijenja animacije (AnimatorOverrideController) i stavlja model u ruku
+
+OPREMA (ScriptableObject GearData, Assets/Data/Items)
+-----------------------------------------------------
+- Slotovi: kaciga, oklop, rukavice, cizme, prsten, ogrlica
+- 17 itema (npr. Iron Helm, Leather Hood, Plate Armour, Iron Gauntlets, Golden Fist,
+  Iron Boots, Plate Greaves, Emerald Ring, Signet Ring, Jade Amulet, Seers Pendant...)
+- Rarity: common / magic / rare (boja imena u tooltipu)
+- Bonusi: Armour, Max HP, Damage, Speed
+
+INVENTORY / EQUIPMENT UI
+------------------------
+- Inventory (I), Equipment (E), Attributes (C) + gumbi na ekranu i X za zatvaranje
+- Desni klik na item u inventoryju:
+  * oruzje / oprema -> equip (zamjena s onim sto je vec u slotu), ponovno -> unequip
+  * potion -> popij (heala, smanji kolicinu)
+- Potioni se stackaju (broj na ikoni)
+- Tooltip na hover za sve iteme (oprema, oruzje, potion): ime, vrsta, statsi, opis, uputa
+- Drag & drop (stari sustav iz pocetnog projekta)
+- UI stil: drvo i pergament (Fantasy Wooden GUI)
+
+LOOT
+----
+- Ruple i srca na podu se skupljaju automatski (srce heala 20)
+- Vreca s lootom (LootBag) i skrinja (Chest) sa shaderom koji svijetli (LootGlow) i iskrama
+- Otvaranje loot prozora:
+  * F kad je player blizu
+  * lijevi klik na vrecu / skrinju kad je player u dometu (2.5 m)
+- Loot prozor: uzmi pojedinacni item ili Take All, zatvori se kad se player udalji
+- Loot moze sadrzavati: ruple, potione, oruzje, opremu
+- Prazna vreca nestane, prazna skrinja ostaje, prestane svijetliti i poklopac se otvori
+
+NEPRIJATELJI (Zombie)
+---------------------
+- AI preko Behaviour Treea (Assets/Data/Enemy.asset):
+  * trazi playera (vidno polje + raycast), trci do njega, napada
+  * kad nema mete luta po random tockama oko sebe
+- Health, health bar iznad glave (pojavi se tek kad primi stetu)
+- Brojevi stete iznad glave (zuti za neprijatelja, crveni za playera)
+- Animacije: hodanje/trcanje, napad, smrt
+- Smrt: gasi AI, ostavi vrecu s lootom (random ruple, potion, oprema, oruzje
+  s podesivim sansama), nestane nakon 3 s
+- Zvukovi: koraci, povremeno rezanje, krik kad ugleda playera, napad, pogodak, smrt
+
+ZVUK (SFX.cs + Assets/Resources/SFX.prefab)
+-------------------------------------------
+- Sustav se sam stvori u svakoj sceni, svi zvukovi se mijenjaju na prefabu
+- UI: klik na gumbe, otvaranje prozora, coinovi, pijenje potiona, equip
+- 3D zvukovi u svijetu (koraci, borba, zombiji) s random pitchem
+
+VFX / SHADERI / MATERIJALI
+--------------------------
+- Slash AOE efekt (Assets/VFX/VFX_SlashAOE.prefab)
+- LootGlow shader za vrece i skrinje
+- Rotirajuci pickupi (Pickup_Spin.cs)
+
+LEVEL
+-----
+- Teren s teksturama, drvece, kamenje, mlin, polje psenice, rijeka
+- NavMeshSurface + blockeri za drvece i rijeku
+
+
